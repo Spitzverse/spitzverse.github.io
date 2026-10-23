@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gremlin Blaster · SpitzVerse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --panel:#111a33; --panel2:#18234a; --ink:#eef2ff; --mute:#aab4da;
+  --teal:#5eead4; --amber:#fbbf24; --good:#34d399; --soft:#fb923c; --line:#2a3766;
+  --lime:#a3e635; --violet:#a78bfa;
+  --font:Andika,"Trebuchet MS","Century Gothic",Verdana,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;
+  -webkit-text-size-adjust:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{font-family:var(--font);color:var(--ink)}
+#wrap{position:fixed;top:env(safe-area-inset-top,0px);bottom:env(safe-area-inset-bottom,0px);left:0;right:0;overflow:hidden;background:var(--bg)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:var(--bg);overflow:hidden}
+
+/* ---------- game side ---------- */
+#game{position:absolute;left:0;top:0;width:1000px;height:1080px;overflow:hidden;
+  background:linear-gradient(180deg,#080c24 0%,#141a45 55%,#2a1d5e 100%)}
+#cv{position:absolute;left:0;top:0;width:1000px;height:1080px}
+#hud{position:absolute;top:20px;left:24px;right:24px;display:flex;gap:14px;justify-content:space-between;align-items:center;font-size:34px;font-weight:700}
+.chip{background:rgba(8,12,36,.72);border:3px solid var(--line);border-radius:18px;padding:6px 20px;white-space:nowrap}
+#hTime{color:var(--teal);font-size:30px} #hScore{color:var(--amber)} #hStreak{color:var(--ink)}
+#ammoBar{position:absolute;top:96px;left:24px;right:24px;height:38px;background:rgba(8,12,36,.72);border:3px solid var(--line);border-radius:20px;overflow:hidden}
+#ammoFill{height:100%;width:50%;background:linear-gradient(90deg,#14b8a6,#5eead4);border-radius:16px;transition:width .2s}
+#ammoTxt{position:absolute;inset:0;display:grid;place-items:center;font-size:24px;font-weight:700}
+#powers{position:absolute;top:146px;left:24px;font-size:28px;font-weight:700;color:var(--amber);min-height:40px}
+#toast{position:absolute;top:300px;left:0;right:0;text-align:center;font-size:64px;font-weight:700;color:var(--amber);opacity:0;transition:opacity .35s;pointer-events:none;text-shadow:0 3px 0 #0b1020}
+#toast.on{opacity:1}
+#freeze{position:absolute;inset:0;background:rgba(6,9,24,.42);display:flex;align-items:flex-start;justify-content:center;padding-top:420px;font-size:46px;font-weight:700;color:var(--ink);opacity:0;transition:opacity .3s;pointer-events:none;text-align:center}
+#freeze.on{opacity:1}
+#freeze span{background:rgba(8,12,36,.8);border:3px solid var(--line);border-radius:22px;padding:14px 32px}
+.playmsg{font-size:46px;line-height:1.3;color:var(--teal)}
+.playmsg small{display:block;font-size:30px;font-weight:400;color:var(--mute);margin-top:14px}
+.pad{position:absolute;bottom:56px;width:200px;height:150px;border-radius:30px;background:rgba(94,234,212,.14);border:3px solid rgba(94,234,212,.5);
+  font-size:72px;line-height:1;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.pad.hold{background:rgba(94,234,212,.34)}
+#btnL{left:24px} #btnR{right:24px}
+#hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:24px;color:var(--mute);pointer-events:none}
+
+/* ---------- question panel ---------- */
+#panel{position:absolute;left:1000px;top:0;width:920px;height:1080px;background:var(--panel);border-left:4px solid var(--line);padding:30px 44px 26px;display:flex;flex-direction:column}
+#pHead{display:flex;justify-content:space-between;align-items:center;font-size:26px;color:var(--mute);height:44px}
+#pTopic{background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:4px 16px;color:var(--teal);font-weight:700;max-width:640px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pPrompt{font-size:38px;line-height:1.3;font-weight:700;min-height:236px;margin:12px 0 12px;display:flex;flex-direction:column;justify-content:center}
+.sent{font-weight:400;font-size:42px;line-height:1.4;margin-top:12px;color:#fff}
+.tgt{background:rgba(251,191,36,.2);border-bottom:6px solid var(--amber);padding:0 6px;border-radius:6px;font-weight:700}
+#pChoices{display:flex;flex-direction:column;gap:10px}
+.ch{display:flex;align-items:center;gap:22px;width:100%;min-height:86px;padding:8px 24px;font-size:36px;font-weight:700;text-align:left;
+  background:var(--panel2);border:3px solid var(--line);border-radius:22px;cursor:pointer}
+.ch .num{flex:0 0 58px;height:58px;border-radius:16px;background:var(--bg);display:grid;place-items:center;font-size:34px;color:var(--teal)}
+.ch:focus-visible,.pad:focus-visible,.btn:focus-visible,.skill:focus-visible,.tchip:focus-visible{outline:4px solid var(--amber);outline-offset:3px}
+.ch.good{background:#0f3b2f;border-color:var(--good)}
+.ch.bad{background:#4a2a14;border-color:var(--soft)}
+.ch.dim{opacity:.5}
+#pFeed{margin-top:12px;font-size:26px;line-height:1.38;color:var(--mute);flex:1;overflow:hidden}
+#pFeed b{color:var(--ink)}
+#pFeed .okmsg{color:var(--good);font-size:32px;font-weight:700}
+#pFeed .nomsg{color:var(--soft);font-weight:700}
+#pNext{display:none;align-self:flex-end;margin-top:6px;font-size:34px;padding:12px 36px}
+#pNext.on{display:block}
+
+/* ---------- buttons, overlays ---------- */
+.btn{font-size:40px;font-weight:700;padding:16px 46px;border-radius:24px;border:0;background:var(--teal);color:#06231f;cursor:pointer}
+.btn.alt{background:var(--panel2);color:var(--ink);border:3px solid var(--line)}
+.btn:active{transform:translateY(2px)}
+.ov{position:absolute;inset:0;background:rgba(6,9,24,.95);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:20;padding:30px}
+.ov.show{display:flex}
+.ov > *{flex-shrink:0}
+#ovStart{background:rgba(6,9,24,.99);padding:18px 30px}
+.eyebrow{font-size:30px;color:var(--teal);font-weight:700;margin:0}
+.title{font-size:92px;line-height:1.05;font-weight:700;margin:4px 0 2px;color:#fff}
+.credit{font-size:28px;color:var(--mute);margin:0 0 14px}
+#nameIn{width:760px;font-size:40px;padding:10px 24px;border-radius:22px;border:3px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--font);text-align:center}
+#nameIn:focus{outline:4px solid var(--amber);outline-offset:3px}
+#nameErr{height:30px;font-size:24px;color:var(--soft);margin:2px 0}
+.row{display:flex;gap:26px;justify-content:center;margin:4px 0 10px}
+.skill{width:560px;padding:14px 24px;border:3px solid var(--line);border-radius:24px;background:var(--panel2);cursor:pointer;text-align:left;font-size:34px;font-weight:700}
+.skill.on{border-color:var(--teal);background:#12324a}
+.skill small{display:block;font-size:24px;font-weight:400;color:var(--mute);margin-top:4px}
+.tchips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:1180px;margin:2px 0 16px;min-height:112px;align-content:flex-start}
+.tchip{font-size:26px;font-weight:700;padding:6px 20px;border-radius:30px;border:3px solid var(--line);background:var(--panel2);color:var(--mute);cursor:pointer}
+.tchip.on{background:var(--teal);color:#06231f;border-color:var(--teal)}
+.how{font-size:24px;color:var(--mute);line-height:1.4;max-width:1300px;margin:14px 0 0}
+.how b{color:var(--ink)}
+#endScore{font-size:150px;font-weight:700;color:var(--amber);line-height:1;margin:6px 0}
+.stats{font-size:36px;margin:2px 0 10px}
+#codeBox{font-size:84px;font-weight:700;letter-spacing:6px;color:var(--teal);background:var(--panel);border:3px dashed var(--line);border-radius:26px;padding:12px 40px;margin:12px 0 8px}
+#showT{font-size:40px;font-weight:700;color:#fff;margin:10px 0 18px}
+#cfv{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none}
+.ov > *:not(#cfv){position:relative}
+.dlg{background:var(--panel);border:3px solid var(--line);border-radius:30px;padding:46px 70px;font-size:44px;font-weight:700}
+.dlg p{margin:0 0 26px}
+.dlg small{display:block;font-size:26px;font-weight:400;color:var(--mute);margin-top:18px}
+.fixedskill{font-size:34px;font-weight:700;padding:14px 32px;border:3px solid var(--line);border-radius:24px;background:var(--panel2)}
+.fixedskill small{display:block;font-size:24px;font-weight:400;color:var(--mute);margin-top:4px}
+a.btn{display:inline-block;text-decoration:none}
+.menulink{position:absolute;top:22px;left:28px;font-size:28px;color:var(--mute);text-decoration:none;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+
+  <div id="game">
+    <canvas id="cv" width="1000" height="1080"></canvas>
+    <div id="hud"><div class="chip" id="hTime">4:00</div><div class="chip" id="hScore">0</div><div class="chip" id="hStreak">Streak 0</div></div>
+    <div id="ammoBar"><div id="ammoFill"></div><div id="ammoTxt">Ammo 30</div></div>
+    <div id="powers"></div>
+    <div id="toast"></div>
+    <div id="freeze"><span>Take your time. Answer to reload!</span></div>
+    <button class="pad" id="btnL" aria-label="Move left">&#9664;</button>
+    <button class="pad" id="btnR" aria-label="Move right">&#9654;</button>
+    <div id="hint">Press F for full screen</div>
+  </div>
+
+  <div id="panel">
+    <div id="pHead"><span id="pTopic">&nbsp;</span><span id="pNum"></span></div>
+    <div id="pPrompt"></div>
+    <div id="pChoices"></div>
+    <div id="pFeed"></div>
+    <button class="btn" id="pNext">Next question &nbsp;(Space)</button>
+  </div>
+
+  <!-- start -->
+  <div class="ov show" id="ovStart">
+    <a class="menulink" id="lnkMenu0" href="../index.html">&larr; Back to menu</a>
+    <p class="eyebrow">SpitzVerse</p>
+    <h1 class="title">Gremlin Blaster</h1>
+    <p class="credit">Made by Mrs. Spitzlberger</p>
+    <input id="nameIn" type="text" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="First name + last initial (like Levi S)" aria-label="Your name">
+    <div id="nameErr"></div>
+    <div class="row" id="skillRow"></div>
+    <div class="tchips" id="topicRow"></div>
+    <button class="btn" id="btnPlay">Play</button>
+    <p class="how"><b>How it works:</b> The game freezes while you read each question, so take your time. A right answer loads lots of ammo; a wrong one loads only a little and shows you why.
+      Then you blast gremlins until the ammo runs out. <b>3 right in a row</b> = triple shot. <b>5 in a row</b> = nova blast. 15 questions per run.<br>
+      Move with <b>&larr; &rarr;</b> or <b>A D</b> (or tap the big arrows). Answer with <b>1&ndash;4</b> or tap. <b>N</b> music &middot; <b>M</b> mute &middot; <b>F</b> full screen &middot; <b>Shift+R</b> new game</p>
+  </div>
+
+  <!-- resume -->
+  <div class="ov" id="ovResume">
+    <div class="dlg"><p id="resumeTxt">Pick up where you left off?</p>
+      <button class="btn" id="btnResume">Keep playing</button> &nbsp; <button class="btn alt" id="btnFresh">New game</button>
+      <small>Saved runs expire after 20 minutes.</small></div>
+  </div>
+
+  <!-- end -->
+  <div class="ov" id="ovEnd">
+    <canvas id="cfv" width="960" height="540"></canvas>
+    <p class="eyebrow">SpitzVerse</p>
+    <h2 class="title" style="font-size:96px">Time&rsquo;s up!</h2>
+    <div id="endScore">0</div>
+    <div class="stats" id="endStats"></div>
+    <div id="codeBox">XXXX-XXXX-XXXX-XXXX</div>
+    <div id="showT">Show this screen to your teacher</div>
+    <div class="row"><button class="btn alt" id="btnCopy">Copy code</button><button class="btn" id="btnSend" style="display:none">Send my code</button><button class="btn" id="btnAgain">Play again</button><a class="btn alt" id="lnkMenu1" href="../index.html">Menu</a></div>
+  </div>
+
+  <!-- confirm -->
+  <div class="ov" id="ovConfirm">
+    <div class="dlg"><p>Start a new game?</p>
+      <button class="btn" id="btnYes">Yes (Y)</button> &nbsp; <button class="btn alt" id="btnNo">No (N)</button>
+      <small>Your current run will be thrown away.</small></div>
+  </div>
+
+</div></div>
+
+<script src="../settings.js"></script>
+<script src="questions.js"></script>
+<script src="scorecode.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var W = 1000, H = 1080, ROUNDS = 15, GAME_NO = 0;
+var SAVE_KEY = 'sv_gb_save', MUSIC_KEY = 'sv_music';
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function rnd(a, b) { return a + Math.random() * (b - a); }
+
+/* ---------- stage scaling + full screen ---------- */
+function fit() {
+  var w = $('wrap').clientWidth, h = $('wrap').clientHeight, s = Math.min(w / 1920, h / 1080), st = $('stage');
+  st.style.transform = 'scale(' + s + ')';
+  st.style.left = ((w - 1920 * s) / 2) + 'px';
+  st.style.top = ((h - 1080 * s) / 2) + 'px';
+}
+window.addEventListener('resize', fit); window.addEventListener('orientationchange', fit); fit();
+function toggleFS() {
+  var el = $('wrap'), on = document.fullscreenElement || document.webkitFullscreenElement;
+  try {
+    if (on) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+  } catch (e) {}
+}
+document.addEventListener('fullscreenchange', fit); document.addEventListener('webkitfullscreenchange', fit);
+
+/* ---------- sound: soft chimes + quiet music ---------- */
+var AC = null, master, musicGain, sfxGain, musicOn = lsGet(MUSIC_KEY) !== 'off', muted = false, mStep = 0, mNext = 0;
+function audioInit() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.connect(AC.destination);
+    musicGain = AC.createGain(); musicGain.gain.value = 0.06; musicGain.connect(master);
+    sfxGain = AC.createGain(); sfxGain.gain.value = 0.55; sfxGain.connect(master);
+    mNext = AC.currentTime + 0.2;
+    setInterval(musicTick, 200);
+  } catch (e) { AC = null; }
+}
+function tone(f, t0, dur, type, vol, dest) {
+  var o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(dest); o.start(t0); o.stop(t0 + dur + 0.05);
+}
+function chimeGood() { if (!AC) return; var t = AC.currentTime; tone(659.25, t, 0.7, 'sine', 0.3, sfxGain); tone(783.99, t + 0.09, 0.7, 'sine', 0.26, sfxGain); tone(987.77, t + 0.18, 0.9, 'sine', 0.22, sfxGain); }
+function chimeSoft() { if (!AC) return; var t = AC.currentTime; tone(293.66, t, 0.8, 'sine', 0.22, sfxGain); tone(246.94, t + 0.16, 1.0, 'sine', 0.18, sfxGain); }
+function chimePower() { if (!AC) return; var t = AC.currentTime; [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function (f, i) { tone(f, t + i * 0.08, 0.8, 'triangle', 0.18, sfxGain); }); }
+function popSnd() { if (!AC) return; tone(740 + Math.random() * 120, AC.currentTime, 0.12, 'sine', 0.05, sfxGain); }
+var CH = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+function musicTick() {
+  if (!AC || !musicOn) { if (AC) mNext = Math.max(mNext, AC.currentTime); return; }
+  var step = 0.357;
+  while (mNext < AC.currentTime + 0.6) {
+    var bar = Math.floor(mStep / 8) % 4, i = mStep % 8, c = CH[bar];
+    if (i === 0) c.forEach(function (f) { tone(f / 2, mNext, 2.7, 'triangle', 0.5, musicGain); });
+    if (i % 2 === 0 || i === 5) tone(c[[0, 1, 2, 1, 2, 1, 0, 2][i]] * (i > 3 ? 2 : 1), mNext, 0.5, 'sine', 0.45, musicGain);
+    mNext += step; mStep++;
+  }
+}
+function setMuted(m) { muted = m; if (AC) master.gain.value = m ? 0 : 1; }
+
+/* ---------- toast ---------- */
+var toastT = 0;
+function toast(msg, ms) {
+  var t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, ms || 1400);
+}
+
+/* ---------- skill picker on the start screen ---------- */
+var META = SpitzQ.meta(), ALLOWED = SpitzQ.allowed(), SUGG = SpitzQ.suggested(), fixed = false, selSet = ALLOWED[0].index, selTopics = {};
+var HUB = window.SV_HUB || '../index.html';
+$('lnkMenu0').href = HUB; $('lnkMenu1').href = HUB;
+function allowedTopics(si) { for (var i = 0; i < ALLOWED.length; i++) if (ALLOWED[i].index === si) return ALLOWED[i].topics; return []; }
+function isSugg(si) { return SUGG.some(function (e) { return e.index === si; }); }
+function pickSet(si) { selSet = si; selTopics = {}; allowedTopics(si).forEach(function (k) { selTopics[k] = true; }); }
+function renderPicker() {
+  var row = $('skillRow'), tr = $('topicRow'); row.innerHTML = ''; tr.innerHTML = '';
+  if (fixed) {
+    var on = allowedTopics(selSet).filter(function (k) { return selTopics[k]; });
+    var names = on.map(function (k) { return META[selSet].topics[k].name; });
+    var d = document.createElement('div'); d.className = 'fixedskill';
+    d.innerHTML = 'Skill: <b>' + META[selSet].name + '</b><small>' + names.join(' \u00B7 ') + (SpitzQ.bonus(selSet, on) > 1 ? ' \u00B7 \u2B50 bonus points!' : '') + '</small>';
+    row.appendChild(d); return;
+  }
+  ALLOWED.forEach(function (a) {
+    var b = document.createElement('button'); b.className = 'skill' + (a.index === selSet ? ' on' : '');
+    b.innerHTML = (isSugg(a.index) ? '\u2B50 ' : '') + META[a.index].name + '<small>' + a.topics.length + ' topics</small>';
+    b.onclick = function () { pickSet(a.index); renderPicker(); };
+    row.appendChild(b);
+  });
+  allowedTopics(selSet).forEach(function (k) {
+    var b = document.createElement('button'); b.className = 'tchip' + (selTopics[k] ? ' on' : ''); b.textContent = META[selSet].topics[k].name;
+    b.onclick = function () {
+      var n = Object.keys(selTopics).filter(function (x) { return selTopics[x]; }).length;
+      if (selTopics[k] && n === 1) return;
+      selTopics[k] = !selTopics[k]; renderPicker();
+    };
+    tr.appendChild(b);
+  });
+}
+pickSet(ALLOWED[0].index);
+(function () { var f = SpitzQ.forGame('gb'); if (f) { fixed = true; selSet = f.setIndex; selTopics = {}; f.topics.forEach(function (k) { selTopics[k] = true; }); } })();
+renderPicker();
+
+/* ---------- game state ---------- */
+var cv = $('cv'), ctx = cv.getContext('2d');
+var G = null, phase = 'start', paused = false, Q = null, curQ = null, qState = 'idle', qNumber = 0;
+var keyL = false, keyR = false, padL = false, padR = false, last = 0, scroll = 0, saveT = 0, cacheH = {};
+
+var stars = document.createElement('canvas'); stars.width = W; stars.height = H;
+(function () {
+  var c = stars.getContext('2d'), i;
+  for (i = 0; i < 150; i++) { c.globalAlpha = 0.25 + Math.random() * 0.6; c.fillStyle = '#cfe3ff'; var r = Math.random() < 0.15 ? 2.6 : 1.5; c.fillRect(Math.random() * W, Math.random() * H, r, r); }
+})();
+
+function newRun(name, setIdx, topics, resume) {
+  G = { name: name, set: setIdx, topics: topics, mode: 'ask', final: false, score: 0, correct: 0, answered: 0, streak: 0, best: 0,
+    ammo: 30, triple: 0, dazed: 0, x: W / 2, fireT: 0, spawnT: 1.4, elapsed: 0, enemies: [], bullets: [], parts: [], rings: [] };
+  if (resume) {
+    ['score', 'correct', 'answered', 'streak', 'best', 'ammo', 'elapsed'].forEach(function (k) { G[k] = resume[k] || 0; });
+  }
+  Q = SpitzQ.make(setIdx, topics);
+  qNumber = resume ? resume.qn : 0;
+  phase = 'play'; paused = false;
+  ['ovStart', 'ovEnd', 'ovResume', 'ovConfirm'].forEach(function (id) { $(id).classList.remove('show'); });
+  audioInit(); last = 0; cacheH = {};
+  nextQ(); hud(true);
+  toast(resume ? 'Welcome back!' : 'Go!', 1200);
+}
+function finish() {
+  phase = 'end'; lsDel(SAVE_KEY);
+  var mult = SpitzQ.bonus(G.set, G.topics), finalScore = Math.min(16383, Math.round(G.score * mult));
+  var bonusTxt = mult > 1 ? ' \u00B7 Suggested skill bonus +' + Math.round((mult - 1) * 100) + '%' : '';
+  var code = SpitzCode.make(GAME_NO, { name: G.name, score: finalScore, correct: G.correct, answered: G.answered, set: G.set, topics: G.topics, seconds: Math.round(G.elapsed), bonus: mult > 1 });
+  var acc = G.answered ? Math.round(G.correct / G.answered * 100) : 0;
+  $('endScore').textContent = finalScore;
+  $('endStats').textContent = G.name + ' \u00B7 ' + G.correct + ' of ' + G.answered + ' right (' + acc + '%) \u00B7 ' + META[G.set].name + bonusTxt;
+  $('codeBox').textContent = code; $('btnCopy').textContent = 'Copy code';
+  var form = SpitzQ.cfg().formUrl || ''; $('btnSend').style.display = form ? '' : 'none'; $('btnSend').setAttribute('data-url', form);
+  $('ovEnd').classList.add('show'); chimePower(); startConfetti();
+}
+
+/* ---------- questions ---------- */
+function nextQ() {
+  curQ = Q.next(); qNumber++; qState = 'ask'; G.mode = 'ask'; $('freeze').classList.add('on');
+  $('pTopic').textContent = curQ.topic; $('pNum').textContent = 'Question ' + qNumber;
+  $('pPrompt').innerHTML = curQ.prompt;
+  var box = $('pChoices'); box.innerHTML = '';
+  curQ.choices.forEach(function (c, i) {
+    var b = document.createElement('button'); b.className = 'ch'; b.setAttribute('data-i', i);
+    b.innerHTML = '<span class="num">' + c.key + '</span><span>' + c.html + '</span>';
+    b.onclick = function () { answer(i); };
+    box.appendChild(b);
+  });
+  $('pFeed').innerHTML = '<span>Tap an answer or press 1\u20134.</span>';
+  $('pNext').classList.remove('on');
+  save();
+}
+function answer(i) {
+  if (phase !== 'play' || paused || qState !== 'ask') return;
+  var c = curQ.choices[i], btns = $('pChoices').children, k;
+  G.answered++;
+  for (k = 0; k < btns.length; k++) { btns[k].disabled = true; if (curQ.choices[k].ok) btns[k].classList.add('good'); else if (k === i) btns[k].classList.add('bad'); else btns[k].classList.add('dim'); }
+  if (c.ok) {
+    G.correct++; G.streak++; if (G.streak > G.best) G.best = G.streak;
+    G.ammo = Math.min(60, G.ammo + 30); G.score += 50 + Math.min(G.streak, 10) * 5;
+    var extra = '';
+    if (G.streak % 3 === 0) { G.triple = 12; extra += ' Triple shot!'; toast('TRIPLE SHOT!', 1500); }
+    if (G.streak % 5 === 0) { nova(); extra += ' Nova blast!'; toast('NOVA BLAST!', 1500); }
+    if (extra) chimePower(); else chimeGood();
+    qState = 'right';
+    $('pFeed').innerHTML = '<div class="okmsg">\u2713 Correct! +30 ammo.' + extra + '</div>';
+    if (G.answered >= ROUNDS) G.final = true;
+    setTimeout(function () { if (qState === 'right' && phase === 'play') startPlay(); }, 950);
+  } else {
+    G.streak = 0; G.ammo = Math.min(60, G.ammo + 8); chimeSoft(); qState = 'wrong'; if (G.answered >= ROUNDS) G.final = true;
+    $('pFeed').innerHTML = '<span class="nomsg">Not quite (only +8 ammo).</span> ' + c.why + ' <b>' + curQ.explain + '</b>';
+    $('pNext').textContent = 'Got it \u2014 blast! (Space)'; $('pNext').classList.add('on');
+  }
+  hud();
+}
+function startPlay() {
+  G.mode = 'play'; G.fireT = 0; qState = 'play';
+  $('freeze').classList.remove('on');
+  var box = $('pChoices'); box.innerHTML = '';
+  $('pPrompt').innerHTML = '<div class="playmsg">' + (G.final ? 'Last blast!' : 'Blast the gremlins!') +
+    '<small>' + (G.final ? 'Your run ends when your ammo runs out.' : 'Your next question comes when your ammo runs out.') + '</small></div>';
+  $('pFeed').innerHTML = '';
+  if (G.final) $('pNext').classList.remove('on');
+  else { $('pNext').textContent = 'Next question now (Space)'; $('pNext').classList.add('on'); }
+  hud();
+}
+function goNext() {
+  if (phase !== 'play' || paused) return;
+  if (qState === 'wrong') startPlay();
+  else if (qState === 'play' && !G.final) nextQ();
+}
+
+/* ---------- play field ---------- */
+function spawn() {
+  var big = G.elapsed > 20 && Math.random() < 0.22, dart = !big && Math.random() < 0.25;
+  var sp = Math.min(235, 125 + G.elapsed * 1.0) * rnd(0.7, 1.45) * (big ? 0.8 : 1) * (dart ? 1.35 : 1);
+  G.enemies.push({ x0: rnd(90, W - 90), x: 0, y: -60, vy: sp, ph: rnd(0, 6.28),
+    amp: dart ? rnd(90, 170) : rnd(30, 120), fq: dart ? rnd(0.02, 0.034) : rnd(0.007, 0.022),
+    big: big, hp: big ? 2 : 1, r: big ? 48 : (dart ? 28 : 34), dart: dart });
+}
+function burst(x, y, col, n) {
+  for (var i = 0; i < n && G.parts.length < 160; i++) {
+    var a = rnd(0, 6.28), s = rnd(60, 260);
+    G.parts.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(0.35, 0.7), c: col, s: rnd(5, 11) });
+  }
+}
+function killEnemy(e, pts) { G.score += pts; burst(e.x, e.y, e.big ? '#a78bfa' : '#a3e635', e.big ? 16 : 10); popSnd(); }
+function nova() {
+  G.rings.push({ r: 20, a: 0.9 });
+  G.enemies.forEach(function (e) { killEnemy(e, 10); });
+  G.enemies.length = 0;
+}
+function shoot() {
+  var y = H - 215;
+  if (G.triple > 0) { G.bullets.push({ x: G.x, y: y, vx: -150, vy: -900 }, { x: G.x, y: y, vx: 0, vy: -920 }, { x: G.x, y: y, vx: 150, vy: -900 }); }
+  else G.bullets.push({ x: G.x, y: y, vx: 0, vy: -920 });
+}
+function update(dt) {
+  G.elapsed += dt;
+  var dir = ((keyL || padL) ? -1 : 0) + ((keyR || padR) ? 1 : 0), i, j, e, b;
+  G.x = Math.max(60, Math.min(W - 60, G.x + dir * 650 * dt));
+  if (G.triple > 0) G.triple -= dt;
+  if (G.dazed > 0) G.dazed -= dt;
+  G.fireT -= dt;
+  if (G.fireT <= 0 && G.ammo > 0 && G.dazed <= 0) { G.fireT = 0.22; G.ammo--; shoot(); }
+  G.spawnT -= dt;
+  if (G.spawnT <= 0) {
+    spawn();
+    if (Math.random() < 0.28) spawn();               // sometimes a pair
+    if (G.elapsed > 30 && Math.random() < 0.12) spawn(); // later, now and then a third
+    G.spawnT = rnd(0.35, 1.25) * Math.max(0.65, 1 - G.elapsed / 200); // uneven gaps: quick bunches, then a breather
+  }
+  for (i = G.enemies.length - 1; i >= 0; i--) {
+    e = G.enemies[i]; e.y += e.vy * dt;
+    e.x = Math.max(e.r, Math.min(W - e.r, e.x0 + Math.sin(e.ph + e.y * e.fq) * e.amp));
+    if (G.dazed <= 0 && Math.abs(e.x - G.x) < e.r + 34 && Math.abs(e.y - (H - 150)) < e.r + 40) {
+      killEnemy(e, 0); G.dazed = 1.4; G.ammo = Math.max(0, G.ammo - 4); G.enemies.splice(i, 1); toast('Gremlin hit! Dazed', 900); continue;
+    }
+    if (e.y > H + 60) G.enemies.splice(i, 1);
+  }
+  for (i = G.bullets.length - 1; i >= 0; i--) {
+    b = G.bullets[i]; b.x += b.vx * dt; b.y += b.vy * dt;
+    if (b.y < -30) { G.bullets.splice(i, 1); continue; }
+    for (j = 0; j < G.enemies.length; j++) {
+      e = G.enemies[j];
+      if (Math.abs(b.x - e.x) < e.r + 6 && Math.abs(b.y - e.y) < e.r + 14) {
+        G.bullets.splice(i, 1); e.hp--; burst(b.x, b.y, '#fde68a', 3);
+        if (e.hp <= 0) { killEnemy(e, e.big ? 25 : 10); G.enemies.splice(j, 1); }
+        break;
+      }
+    }
+  }
+  for (i = G.parts.length - 1; i >= 0; i--) { var p = G.parts[i]; p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; if (p.life > p.max) G.parts.splice(i, 1); }
+  for (i = G.rings.length - 1; i >= 0; i--) { var r = G.rings[i]; r.r += 1500 * dt; r.a -= 0.9 * dt; if (r.a <= 0) G.rings.splice(i, 1); }
+  saveT += dt; if (saveT > 2) { saveT = 0; save(); }
+  hud();
+  if (G.ammo <= 0 && G.bullets.length === 0) { if (G.final) finish(); else nextQ(); }
+}
+
+/* ---------- drawing ---------- */
+function drawGremlin(e) {
+  var r = e.r;
+  ctx.save(); ctx.translate(e.x, e.y);
+  ctx.fillStyle = e.big ? (e.hp === 1 ? '#c4b5fd' : '#8b5cf6') : (e.dart ? '#f59e0b' : '#84cc16');
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.2832); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-r * 0.75, -r * 0.35); ctx.lineTo(-r * 0.95, -r * 1.25); ctx.lineTo(-r * 0.15, -r * 0.8); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(r * 0.75, -r * 0.35); ctx.lineTo(r * 0.95, -r * 1.25); ctx.lineTo(r * 0.15, -r * 0.8); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-r * 0.36, -r * 0.1, r * 0.26, 0, 6.2832); ctx.arc(r * 0.36, -r * 0.1, r * 0.26, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = '#111827';
+  ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.05, r * 0.12, 0, 6.2832); ctx.arc(r * 0.32, -r * 0.05, r * 0.12, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = '#111827'; ctx.lineWidth = 4; ctx.beginPath();
+  ctx.moveTo(-r * 0.4, r * 0.4); ctx.lineTo(-r * 0.2, r * 0.55); ctx.lineTo(0, r * 0.4); ctx.lineTo(r * 0.2, r * 0.55); ctx.lineTo(r * 0.4, r * 0.4); ctx.stroke();
+  ctx.restore();
+}
+function drawShip() {
+  ctx.save(); ctx.translate(G.x, H - 150);
+  if (G.dazed > 0) ctx.globalAlpha = 0.45;
+  ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.moveTo(-14, 36); ctx.lineTo(0, 74 + (G.ammo > 0 ? 8 : 0)); ctx.lineTo(14, 36); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#5eead4'; ctx.beginPath(); ctx.moveTo(0, -56); ctx.lineTo(26, 20); ctx.lineTo(26, 46); ctx.lineTo(-26, 46); ctx.lineTo(-26, 20); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#0f766e'; ctx.beginPath(); ctx.moveTo(-26, 20); ctx.lineTo(-52, 52); ctx.lineTo(-26, 46); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(26, 20); ctx.lineTo(52, 52); ctx.lineTo(26, 46); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#0b1020'; ctx.beginPath(); ctx.arc(0, -4, 13, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(0, -4, 7, 0, 6.2832); ctx.fill();
+  ctx.restore();
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(stars, 0, scroll); ctx.drawImage(stars, 0, scroll - H);
+  if (!G) return;
+  var i;
+  for (i = 0; i < G.rings.length; i++) { var r = G.rings[i]; ctx.globalAlpha = Math.max(0, r.a); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(G.x, H - 150, r.r, 0, 6.2832); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  for (i = 0; i < G.enemies.length; i++) drawGremlin(G.enemies[i]);
+  ctx.fillStyle = G.triple > 0 ? '#fbbf24' : '#a5f3fc';
+  for (i = 0; i < G.bullets.length; i++) { var b = G.bullets[i]; ctx.fillRect(b.x - 5, b.y - 16, 10, 32); }
+  for (i = 0; i < G.parts.length; i++) { var p = G.parts[i]; ctx.globalAlpha = 1 - p.life / p.max; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s); }
+  ctx.globalAlpha = 1;
+  drawShip();
+}
+
+/* ---------- HUD (DOM only touched when a value changes) ---------- */
+function setT(id, v) { if (cacheH[id] !== v) { cacheH[id] = v; $(id).textContent = v; } }
+function hud(force) {
+  setT('hTime', 'Question ' + Math.min(G.answered + (G.mode === 'ask' ? 1 : 0), ROUNDS) + ' of ' + ROUNDS);
+  setT('hScore', String(G.score));
+  setT('hStreak', 'Streak ' + G.streak);
+  setT('ammoTxt', 'Ammo ' + G.ammo);
+  var pct = Math.round(G.ammo / 60 * 100) + '%';
+  if (cacheH.pct !== pct) { cacheH.pct = pct; $('ammoFill').style.width = pct; }
+  var pw = G.triple > 0 ? 'Triple shot ' + Math.ceil(G.triple) + 's' : '';
+  setT('powers', pw);
+}
+
+/* ---------- save / resume (20 minutes) ---------- */
+function save() {
+  if (phase !== 'play' || !G) return;
+  lsSet(SAVE_KEY, JSON.stringify({ t: Date.now(), name: G.name, set: G.set, topics: G.topics, elapsed: G.elapsed, score: G.score,
+    correct: G.correct, answered: G.answered, streak: G.streak, best: G.best, ammo: G.ammo, qn: qNumber }));
+}
+var saved = null;
+(function () {
+  var raw = lsGet(SAVE_KEY); if (!raw) return;
+  try { saved = JSON.parse(raw); } catch (e) { saved = null; }
+  if (!saved || !saved.t || Date.now() - saved.t > 20 * 60 * 1000 || saved.answered >= ROUNDS) { saved = null; lsDel(SAVE_KEY); return; }
+  $('resumeTxt').textContent = 'Keep playing, ' + saved.name + '? (' + saved.score + ' points)';
+  $('ovResume').classList.add('show');
+})();
+$('btnResume').onclick = function () { newRun(saved.name, saved.set, saved.topics, saved); };
+$('btnFresh').onclick = function () { lsDel(SAVE_KEY); saved = null; $('ovResume').classList.remove('show'); };
+
+/* ---------- confetti on a half-size canvas ---------- */
+var cfv = $('cfv'), cf = cfv.getContext('2d'), cfp = [], cfOn = false;
+function startConfetti() {
+  cfp = []; var cols = ['#5eead4', '#fbbf24', '#a78bfa', '#a3e635', '#fb923c', '#f9a8d4'], i;
+  for (i = 0; i < 110; i++) cfp.push({ x: rnd(0, 960), y: rnd(-540, 0), vy: rnd(60, 140), vx: rnd(-30, 30), s: rnd(6, 12), c: cols[i % cols.length] });
+  cfOn = true; var t0 = performance.now();
+  (function step(now) {
+    if (!cfOn) return; var dt = Math.min(0.05, (now - (step.l || now)) / 1000); step.l = now;
+    cf.clearRect(0, 0, 960, 540);
+    cfp.forEach(function (p) { p.y += p.vy * dt; p.x += p.vx * dt; if (p.y > 550) p.y = -10; cf.fillStyle = p.c; cf.fillRect(p.x, p.y, p.s, p.s * 0.6); });
+    if (now - t0 > 6000) { cfOn = false; cf.clearRect(0, 0, 960, 540); return; }
+    requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* ---------- start / controls ---------- */
+function tryStart() {
+  var name = $('nameIn').value.replace(/\s+/g, ' ').trim();
+  if (name.length < 2) { $('nameErr').textContent = 'Type your first name and last initial first.'; $('nameIn').focus(); return; }
+  $('nameErr').textContent = '';
+  var tp = []; Object.keys(selTopics).forEach(function (k) { if (selTopics[k]) tp.push(+k); });
+  newRun(name, selSet, tp, null);
+}
+$('btnPlay').onclick = tryStart;
+$('nameIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryStart(); });
+$('btnAgain').onclick = function () { cfOn = false; $('ovEnd').classList.remove('show'); phase = 'start'; $('ovStart').classList.add('show'); };
+$('btnSend').onclick = function () {
+  var t = $('codeBox').textContent, u = $('btnSend').getAttribute('data-url');
+  try { navigator.clipboard.writeText(t); } catch (e) {}
+  $('btnSend').textContent = 'Code copied! Paste it in the form'; if (u) window.open(u, '_blank');
+};
+$('btnCopy').onclick = function () {
+  var t = $('codeBox').textContent;
+  try { navigator.clipboard.writeText(t).then(function () { $('btnCopy').textContent = 'Copied!'; }, function () { $('btnCopy').textContent = 'Copy it by hand'; }); }
+  catch (e) { $('btnCopy').textContent = 'Copy it by hand'; }
+};
+$('pNext').onclick = goNext;
+function openConfirm() { if (phase === 'start') return; paused = true; $('ovConfirm').classList.add('show'); }
+function closeConfirm() { paused = false; last = 0; $('ovConfirm').classList.remove('show'); }
+function confirmYes() {
+  lsDel(SAVE_KEY); saved = null; cfOn = false; paused = false; phase = 'start'; G = null;
+  ['ovConfirm', 'ovEnd', 'ovResume'].forEach(function (id) { $(id).classList.remove('show'); });
+  $('ovStart').classList.add('show'); ctx.clearRect(0, 0, W, H);
+}
+$('btnYes').onclick = confirmYes; $('btnNo').onclick = closeConfirm;
+
+function holdBtn(el, set) {
+  var on = function (e) { e.preventDefault(); set(true); el.classList.add('hold'); };
+  var off = function () { set(false); el.classList.remove('hold'); };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off);
+  el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
+  el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+}
+holdBtn($('btnL'), function (v) { padL = v; }); holdBtn($('btnR'), function (v) { padR = v; });
+
+document.addEventListener('keydown', function (e) {
+  var k = e.key, typing = e.target && e.target.tagName === 'INPUT';
+  if ($('ovConfirm').classList.contains('show')) {
+    if (k === 'y' || k === 'Y') confirmYes(); else if (k === 'n' || k === 'N' || k === 'Escape') closeConfirm();
+    e.preventDefault(); return;
+  }
+  if (typing) return;
+  if (e.shiftKey && (k === 'R' || k === 'r')) { openConfirm(); e.preventDefault(); return; }
+  if (k === 'n' || k === 'N') { musicOn = !musicOn; lsSet(MUSIC_KEY, musicOn ? 'on' : 'off'); toast(musicOn ? 'Music on' : 'Music off', 900); return; }
+  if (k === 'm' || k === 'M') { setMuted(!muted); toast(muted ? 'Sound off' : 'Sound on', 900); return; }
+  if (k === 'f' || k === 'F') { toggleFS(); return; }
+  if (phase !== 'play' || paused) return;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') { keyL = true; e.preventDefault(); }
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') { keyR = true; e.preventDefault(); }
+  else if (k >= '1' && k <= '4') { answer(+k - 1); }
+  else if (k === ' ' || k === 'Enter') { goNext(); e.preventDefault(); }
+});
+document.addEventListener('keyup', function (e) {
+  var k = e.key;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') keyL = false;
+  if (k === 'ArrowRight' || k === 'd' || k === 'D') keyR = false;
+});
+window.addEventListener('blur', function () { keyL = keyR = padL = padR = false; });
+
+/* ---------- main loop (time-based) ---------- */
+function loop(now) {
+  var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
+  scroll = (scroll + 26 * dt) % H;
+  if (phase === 'play' && !paused && G && G.mode === 'play') update(dt);
+  if (phase === 'play' || phase === 'end') draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+window.__gb = { get G() { return G; }, answer: answer, nextQ: nextQ, finish: finish, get q() { return curQ; } }; // for the smoke test
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpitzVerse</title>
+<meta http-equiv="refresh" content="3; url=/">
+<style>body{margin:0;background:#0b1020;color:#eef2ff;font-family:Andika,"Trebuchet MS",Verdana,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center;font-size:26px}a{color:#5eead4;font-size:32px;font-weight:700}</style>
+</head>
+<body><div><h1>Oops, that page wandered off.</h1><p>Taking you back to the games&hellip;</p><p><a href="./">Go to the SpitzVerse menu</a></p></div>
+<script>
+// On GitHub Pages the site may live in a sub-folder (username.github.io/repo/); send people to that folder's menu.
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean), base = '/';
+  if (location.hostname.indexOf('github.io') > -1 && parts.length > 1) base = '/' + parts[0] + '/';
+  document.querySelector('a').href = base; document.querySelector('meta[http-equiv=refresh]').content = '3; url=' + base;
+  setTimeout(function () { location.replace(base); }, 2500);
+})();
+</script></body>
+</html>

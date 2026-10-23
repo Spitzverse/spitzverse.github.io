@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SpitzVerse · Pick a game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--panel:#111a33;--panel2:#18234a;--ink:#eef2ff;--mute:#aab4da;--teal:#5eead4;--amber:#fbbf24;--good:#34d399;--soft:#fb923c;--line:#2a3766;--font:Andika,"Trebuchet MS","Century Gothic",Verdana,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:22px;line-height:1.45;padding:0 0 env(safe-area-inset-bottom,0px)}
+a{color:var(--teal)}
+button,input,select,textarea{font-family:var(--font);color:var(--ink);font-size:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 24px 40px}
+.eyebrow{color:var(--teal);font-weight:700;margin:0;font-size:24px}
+h1{font-size:clamp(34px,5.2vw,64px);line-height:1.1;margin:4px 0 4px}
+h2{font-size:clamp(26px,3vw,36px);margin:30px 0 12px}
+.credit{color:var(--mute);margin:0 0 14px}
+.topbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;background:var(--panel2);border:3px solid var(--line);border-radius:999px;padding:8px 22px;font-weight:700;text-decoration:none;color:var(--ink)}
+.btn{display:inline-block;font-size:26px;font-weight:700;padding:12px 30px;border-radius:20px;border:0;background:var(--teal);color:#06231f;cursor:pointer;text-decoration:none}
+.btn.alt{background:var(--panel2);color:var(--ink);border:3px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:default}
+:focus-visible{outline:4px solid var(--amber);outline-offset:3px}
+.card{background:var(--panel);border:3px solid var(--line);border-radius:24px;padding:20px 24px;margin:16px 0}
+.mute{color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.tchip{font-size:20px;font-weight:700;padding:6px 18px;border-radius:999px;border:3px solid var(--line);background:var(--panel2);color:var(--mute);cursor:pointer}
+.tchip.on{background:var(--teal);color:#06231f;border-color:var(--teal)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.gcard{position:relative;text-align:left;padding:0;border:4px solid var(--line);border-radius:26px;background:var(--panel);overflow:hidden;cursor:pointer;display:block;width:100%}
+.gcard svg{display:block;width:100%;height:auto}
+.gcard .gt{padding:12px 18px 16px}
+.gcard b{display:block;font-size:30px}
+.gcard span.d{display:block;color:var(--mute);font-size:21px}
+.gcard.on{border-color:var(--teal);box-shadow:0 0 0 4px rgba(94,234,212,.25)}
+.gcard.on::after{content:"\2713 Picked";position:absolute;right:12px;top:12px;background:var(--teal);color:#06231f;font-weight:700;padding:4px 14px;border-radius:999px}
+.badge{position:absolute;left:12px;top:12px;background:var(--amber);color:#2a1d00;font-weight:700;padding:4px 14px;border-radius:999px;z-index:2}
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:16px}
+.scard{text-align:left;border:4px solid var(--line);border-radius:24px;background:var(--panel2);padding:16px 22px;cursor:pointer;font-size:30px;font-weight:700;display:block;width:100%}
+.scard small{display:block;font-size:21px;font-weight:400;color:var(--mute)}
+.scard.on{border-color:var(--teal);background:#12324a}
+.scard .star{color:var(--amber)}
+#sugg{background:#3a2d12;border:3px solid var(--amber);border-radius:24px;padding:16px 22px;margin:16px 0}
+#sugg h3{margin:0 0 4px;font-size:28px;color:var(--amber)}
+#sugg p{margin:4px 0 10px}
+#sugg .b{background:var(--amber);color:#2a1d00;border:0;border-radius:18px;padding:12px 24px;font-weight:700;font-size:24px;cursor:pointer;margin:4px 10px 4px 0}
+#bar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 28%);padding:26px 0 14px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+#sel{font-size:24px}
+#play{font-size:44px;padding:16px 64px;border-radius:26px}
+#play.off{opacity:.45;pointer-events:none}
+.none{padding:30px;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div><p class="eyebrow">SpitzVerse</p><h1>Pick a game. Pick a skill. Play!</h1><p class="credit">Made by Mrs. Spitzlberger</p></div>
+    <a class="pill" id="lbLink" href="leaderboard.html">&#127942; Leaderboard</a></div>
+
+  <div id="sugg" hidden></div>
+
+  <h2>1. Pick a game</h2>
+  <div class="grid" id="games"></div>
+
+  <h2>2. Pick a skill</h2>
+  <div class="skills" id="skills"></div>
+  <div class="chips" id="topics" style="margin-top:14px"></div>
+
+  <div id="bar"><div id="sel" class="mute"></div><a id="play" class="btn" href="#">Play</a></div>
+</div>
+<script src="settings.js"></script>
+<script src="games/catalog.js"></script>
+<script src="games/questions.js"></script>
+<script src="games/scorecode.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var P = window.SV_PREVIEW || null;
+var CFG = SpitzQ.cfg(), META = SpitzQ.meta(), ALLOWED = SpitzQ.allowed(), SUGG = SpitzQ.suggested();
+var BONUS = CFG.bonus == null ? 25 : CFG.bonus;
+var state = { game: null, set: ALLOWED[0].index, topics: {} };
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+function unlockInfo(g) {
+  var o = CFG.unlock || {}, u = (o[g.id] !== undefined) ? o[g.id] : SV_UNLOCK[g.id];
+  if (u === null || u === undefined || u === 'hidden') return null;
+  if (u === 'now') return { isNew: false };
+  var d = new Date(u); if (isNaN(d.getTime())) return null;
+  var age = Date.now() - d.getTime(); if (age < 0) return null;
+  return { isNew: age < 7 * 864e5 };
+}
+function favRank(id) { var i = SV_FAVORITES.indexOf(id); return i < 0 ? 99 : i; }
+function visibleGames() {
+  var list = [];
+  SV_GAMES.forEach(function (g) { var u = unlockInfo(g); if (u) list.push({ g: g, isNew: u.isNew }); });
+  list.sort(function (a, b) { return (b.isNew - a.isNew) || (favRank(a.g.id) - favRank(b.g.id)); });
+  return list;
+}
+function isSugg(si) { return SUGG.some(function (e) { return e.index === si; }); }
+function allowedTopics(si) { for (var i = 0; i < ALLOWED.length; i++) if (ALLOWED[i].index === si) return ALLOWED[i].topics; return []; }
+function pickSet(si, topicList) {
+  state.set = si; state.topics = {};
+  (topicList || allowedTopics(si)).forEach(function (k) { state.topics[k] = true; });
+}
+function orderedSkills() { return ALLOWED.slice().sort(function (a, b) { return (isSugg(b.index) ? 1 : 0) - (isSugg(a.index) ? 1 : 0); }); }
+
+var VG = visibleGames();
+// remember the last choice (only if it is still allowed)
+(function () {
+  var last = null; try { last = JSON.parse(lsGet('sv_hub_last') || 'null'); } catch (e) {}
+  pickSet(ALLOWED[0].index);
+  if (SUGG.length) pickSet(SUGG[0].index, SUGG[0].topics);
+  if (last) {
+    SpitzQ.SETS.forEach(function (s, i) { if (s.id === last.set && allowedTopics(i).length) {
+      var tl = []; (last.topics || []).forEach(function (id) { s.topics.forEach(function (t, k) { if (t.id === id && allowedTopics(i).indexOf(k) >= 0) tl.push(k); }); });
+      pickSet(i, tl.length ? tl : null);
+    } });
+  }
+  state.game = VG.length ? VG[0].g.id : null;
+  if (last) VG.forEach(function (v) { if (v.g.id === last.game) state.game = v.g.id; });
+})();
+
+function renderSugg() {
+  var box = $('sugg');
+  if (!SUGG.length) { box.hidden = true; return; }
+  box.hidden = false; box.innerHTML = '';
+  var h = document.createElement('h3'); h.textContent = '\u2B50 Suggested by Mrs. Spitzlberger'; box.appendChild(h);
+  var p = document.createElement('p');
+  p.textContent = (CFG.note ? CFG.note + ' ' : '') + (BONUS > 0 ? 'Play these for +' + BONUS + '% bonus points!' : ''); box.appendChild(p);
+  SUGG.forEach(function (e) {
+    var b = document.createElement('button'); b.className = 'b';
+    var names = e.topics.length === META[e.index].topics.length ? '' : ': ' + e.topics.map(function (k) { return META[e.index].topics[k].name; }).join(', ');
+    b.textContent = META[e.index].name + names;
+    b.onclick = function () { pickSet(e.index, e.topics); render(); $('bar').scrollIntoView({ block: 'end' }); };
+    box.appendChild(b);
+  });
+}
+function renderGames() {
+  var box = $('games'); box.innerHTML = '';
+  if (!VG.length) { box.innerHTML = '<div class="none">No games are open yet. Check back soon!</div>'; return; }
+  VG.forEach(function (v) {
+    var b = document.createElement('button'); b.className = 'gcard' + (state.game === v.g.id ? ' on' : '');
+    b.innerHTML = (v.isNew ? '<span class="badge">NEW</span>' : '') + v.g.art + '<div class="gt"><b></b><span class="d"></span></div>';
+    b.querySelector('b').textContent = v.g.name; b.querySelector('.d').textContent = v.g.desc;
+    b.setAttribute('aria-pressed', state.game === v.g.id ? 'true' : 'false');
+    b.onclick = function () { state.game = v.g.id; render(); };
+    box.appendChild(b);
+  });
+}
+function renderSkills() {
+  var box = $('skills'), tr = $('topics'); box.innerHTML = ''; tr.innerHTML = '';
+  orderedSkills().forEach(function (a) {
+    var b = document.createElement('button'); b.className = 'scard' + (a.index === state.set ? ' on' : '');
+    var sug = isSugg(a.index);
+    b.innerHTML = (sug ? '<span class="star">\u2B50</span> ' : '') + '<span></span><small></small>';
+    b.querySelector('span:not(.star)').textContent = META[a.index].name;
+    b.querySelector('small').textContent = a.topics.length + (a.topics.length === 1 ? ' topic' : ' topics') + (sug && BONUS > 0 ? ' \u00B7 +' + BONUS + '% bonus' : '');
+    b.setAttribute('aria-pressed', a.index === state.set ? 'true' : 'false');
+    b.onclick = function () { pickSet(a.index); render(); };
+    box.appendChild(b);
+  });
+  allowedTopics(state.set).forEach(function (k) {
+    var t = META[state.set].topics[k], b = document.createElement('button');
+    var sug = SUGG.some(function (e) { return e.index === state.set && e.topics.indexOf(k) >= 0; });
+    b.className = 'tchip' + (state.topics[k] ? ' on' : ''); b.textContent = (sug ? '\u2B50 ' : '') + t.name;
+    b.setAttribute('aria-pressed', state.topics[k] ? 'true' : 'false');
+    b.onclick = function () {
+      var n = Object.keys(state.topics).filter(function (x) { return state.topics[x]; }).length;
+      if (state.topics[k] && n === 1) return;
+      state.topics[k] = !state.topics[k]; render();
+    };
+    tr.appendChild(b);
+  });
+}
+function render() {
+  renderSugg(); renderGames(); renderSkills();
+  var g = SV_GAMES.filter(function (x) { return x.id === state.game; })[0];
+  var on = allowedTopics(state.set).filter(function (k) { return state.topics[k]; });
+  var set = META[state.set], play = $('play');
+  if (!g) { $('sel').textContent = ''; play.className = 'btn off'; play.removeAttribute('href'); return; }
+  var tids = on.map(function (k) { return set.topics[k].id; });
+  var bonus = SpitzQ.bonus(state.set, on) > 1;
+  $('sel').innerHTML = '';
+  var s1 = document.createElement('div'); s1.innerHTML = '<b></b> \u00B7 <span></span>';
+  s1.querySelector('b').textContent = g.name; s1.querySelector('span').textContent = set.name + ' (' + on.length + ' of ' + allowedTopics(state.set).length + ' topics)' + (bonus ? ' \u00B7 \u2B50 +' + BONUS + '% bonus' : '');
+  $('sel').appendChild(s1);
+  var url;
+  if (P && P.games && P.games[g.id]) url = P.games[g.id] + '#' + set.id;
+  else if (P) url = '#';
+  else url = 'games/' + g.id + '.html?set=' + set.id + '&topics=' + tids.join(',');
+  play.href = url; play.className = 'btn';
+  if (P) play.target = '_blank';
+  lsSet('sv_hub_last', JSON.stringify({ game: g.id, set: set.id, topics: tids }));
+}
+if (P && P.pages && P.pages.leaderboard) $('lbLink').href = P.pages.leaderboard;
+render();
+})();
+</script>
+</body>
+</html>

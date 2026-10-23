@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SpitzVerse · Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--panel:#111a33;--panel2:#18234a;--ink:#eef2ff;--mute:#aab4da;--teal:#5eead4;--amber:#fbbf24;--good:#34d399;--soft:#fb923c;--line:#2a3766;--font:Andika,"Trebuchet MS","Century Gothic",Verdana,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:22px;line-height:1.45;padding:0 0 env(safe-area-inset-bottom,0px)}
+a{color:var(--teal)}
+button,input,select,textarea{font-family:var(--font);color:var(--ink);font-size:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 24px 40px}
+.eyebrow{color:var(--teal);font-weight:700;margin:0;font-size:24px}
+h1{font-size:clamp(34px,5.2vw,64px);line-height:1.1;margin:4px 0 4px}
+h2{font-size:clamp(26px,3vw,36px);margin:30px 0 12px}
+.credit{color:var(--mute);margin:0 0 14px}
+.topbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;background:var(--panel2);border:3px solid var(--line);border-radius:999px;padding:8px 22px;font-weight:700;text-decoration:none;color:var(--ink)}
+.btn{display:inline-block;font-size:26px;font-weight:700;padding:12px 30px;border-radius:20px;border:0;background:var(--teal);color:#06231f;cursor:pointer;text-decoration:none}
+.btn.alt{background:var(--panel2);color:var(--ink);border:3px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:default}
+:focus-visible{outline:4px solid var(--amber);outline-offset:3px}
+.card{background:var(--panel);border:3px solid var(--line);border-radius:24px;padding:20px 24px;margin:16px 0}
+.mute{color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.tchip{font-size:20px;font-weight:700;padding:6px 18px;border-radius:999px;border:3px solid var(--line);background:var(--panel2);color:var(--mute);cursor:pointer}
+.tchip.on{background:var(--teal);color:#06231f;border-color:var(--teal)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.tabs{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 8px}
+.tab{font-size:26px;font-weight:700;padding:10px 26px;border-radius:999px;border:3px solid var(--line);background:var(--panel2);color:var(--mute);cursor:pointer}
+.tab.on{background:var(--teal);color:#06231f;border-color:var(--teal)}
+table{width:100%;border-collapse:separate;border-spacing:0 10px}
+th{text-align:left;color:var(--mute);font-weight:400;font-size:20px;padding:0 16px}
+td{background:var(--panel);padding:14px 16px;font-size:26px;border-top:3px solid var(--line);border-bottom:3px solid var(--line)}
+td:first-child{border-left:3px solid var(--line);border-radius:18px 0 0 18px;width:90px;font-weight:700;color:var(--amber);font-size:32px}
+td:last-child{border-right:3px solid var(--line);border-radius:0 18px 18px 0}
+tr.top1 td{background:#3a2d12;border-color:var(--amber)}
+.sc{font-weight:700;color:var(--amber)}
+.bn{display:inline-block;background:var(--amber);color:#2a1d00;border-radius:999px;font-size:17px;font-weight:700;padding:2px 10px;margin-left:8px;vertical-align:middle}
+.sk{color:var(--mute);font-size:21px}
+.note{background:var(--panel2);border:3px dashed var(--line);border-radius:18px;padding:12px 18px;margin:14px 0;color:var(--mute)}
+.empty{text-align:center;padding:40px;color:var(--mute);font-size:26px}
+@media (max-width:640px){td{font-size:21px;padding:10px}.hidemobile{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div><p class="eyebrow">SpitzVerse</p><h1>&#127942; Leaderboard</h1><p class="credit">Top 10 for each game. Made by Mrs. Spitzlberger</p></div>
+    <a class="pill" id="menuLink" href="index.html">&larr; Back to games</a></div>
+  <div id="note"></div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="board"></div>
+  <p class="mute" id="updated"></p>
+</div>
+<script src="settings.js"></script>
+<script src="games/catalog.js"></script>
+<script src="games/questions.js"></script>
+<script src="games/scorecode.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var P = window.SV_PREVIEW || null, META = SpitzQ.meta(), DATA = null, cur = null;
+var SAMPLE = { updated: 'sample', games: {
+  gremlin_blaster: [
+    { name: 'Levi S', score: 1842, correct: 14, answered: 15, set: 'pos', topics: ['np', 'av', 'vb', 'pcj'], bonus: false },
+    { name: 'Mia R', score: 1710, correct: 13, answered: 15, set: 'sent', topics: ['subj'], bonus: true },
+    { name: 'Zed Q', score: 1390, correct: 11, answered: 15, set: 'pos', topics: ['vb'], bonus: false }],
+  last_bell: [
+    { name: 'Ana B', score: 5120, correct: 17, answered: 18, set: 'sent', topics: ['subj', 'obj'], bonus: true },
+    { name: 'Levi S', score: 4380, correct: 15, answered: 17, set: 'pos', topics: ['np', 'av', 'vb', 'pcj'], bonus: false }] } };
+function skillText(e) {
+  var set = META.filter(function (s) { return s.id === e.set; })[0]; if (!set) return '';
+  var tn = (e.topics || []).map(function (id) { var t = set.topics.filter(function (x) { return x.id === id; })[0]; return t ? t.name : null; }).filter(Boolean);
+  return set.name + (tn.length && tn.length < set.topics.length ? ' \u2014 ' + tn.join(', ') : '');
+}
+function render() {
+  var tabs = $('tabs'); tabs.innerHTML = '';
+  SV_GAMES.forEach(function (g) {
+    var b = document.createElement('button'); b.className = 'tab' + (cur === g.id ? ' on' : ''); b.textContent = g.name; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', cur === g.id ? 'true' : 'false');
+    b.onclick = function () { cur = g.id; render(); }; tabs.appendChild(b);
+  });
+  var list = (DATA && DATA.games && DATA.games[cur]) || [], box = $('board'); box.innerHTML = '';
+  if (!list.length) { box.innerHTML = '<div class="empty">No scores here yet. Be the first!</div>'; return; }
+  var t = document.createElement('table');
+  t.innerHTML = '<thead><tr><th>Rank</th><th>Name</th><th>Score</th><th class="hidemobile">Skill</th><th class="hidemobile">Right</th></tr></thead>';
+  var tb = document.createElement('tbody');
+  list.slice(0, 10).forEach(function (e, i) {
+    var tr = document.createElement('tr'); if (i === 0) tr.className = 'top1';
+    var acc = e.answered ? Math.round(e.correct / e.answered * 100) : 0;
+    var c0 = document.createElement('td'); c0.textContent = i + 1;
+    var c1 = document.createElement('td'); c1.textContent = e.name;
+    var c2 = document.createElement('td'); c2.innerHTML = '<span class="sc"></span>'; c2.querySelector('.sc').textContent = e.score;
+    if (e.bonus) { var bn = document.createElement('span'); bn.className = 'bn'; bn.textContent = '\u2B50 bonus'; c2.appendChild(bn); }
+    var c3 = document.createElement('td'); c3.className = 'sk hidemobile'; c3.textContent = skillText(e);
+    var c4 = document.createElement('td'); c4.className = 'hidemobile'; c4.textContent = acc + '%';
+    [c0, c1, c2, c3, c4].forEach(function (c) { tr.appendChild(c); }); tb.appendChild(tr);
+  });
+  t.appendChild(tb); box.appendChild(t);
+}
+function start(data, isSample) {
+  DATA = data;
+  var first = null;
+  SV_GAMES.forEach(function (g) { if (!first && data.games && data.games[g.id] && data.games[g.id].length) first = g.id; });
+  cur = first || SV_GAMES[0].id;
+  if (isSample) $('note').innerHTML = '<div class="note">These are <b>sample scores</b> so you can see how the board looks. Real scores show up after you publish them from the teacher page.</div>';
+  $('updated').textContent = (data.updated && data.updated !== 'sample') ? 'Last updated ' + data.updated : '';
+  render();
+}
+if (P && P.pages && P.pages.hub) $('menuLink').href = P.pages.hub;
+if (P) start(SAMPLE, true);
+else fetch('data/leaderboard.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) { start(d, false); })
+  .catch(function () { start({ games: {} }, false); });
+})();
+</script>
+</body>
+</html>

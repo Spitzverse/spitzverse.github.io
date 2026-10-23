@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SpitzVerse · Teacher page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--panel:#111a33;--panel2:#18234a;--ink:#eef2ff;--mute:#aab4da;--teal:#5eead4;--amber:#fbbf24;--good:#34d399;--soft:#fb923c;--line:#2a3766;--font:Andika,"Trebuchet MS","Century Gothic",Verdana,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:22px;line-height:1.45;padding:0 0 env(safe-area-inset-bottom,0px)}
+a{color:var(--teal)}
+button,input,select,textarea{font-family:var(--font);color:var(--ink);font-size:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 24px 40px}
+.eyebrow{color:var(--teal);font-weight:700;margin:0;font-size:24px}
+h1{font-size:clamp(34px,5.2vw,64px);line-height:1.1;margin:4px 0 4px}
+h2{font-size:clamp(26px,3vw,36px);margin:30px 0 12px}
+.credit{color:var(--mute);margin:0 0 14px}
+.topbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;background:var(--panel2);border:3px solid var(--line);border-radius:999px;padding:8px 22px;font-weight:700;text-decoration:none;color:var(--ink)}
+.btn{display:inline-block;font-size:26px;font-weight:700;padding:12px 30px;border-radius:20px;border:0;background:var(--teal);color:#06231f;cursor:pointer;text-decoration:none}
+.btn.alt{background:var(--panel2);color:var(--ink);border:3px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:default}
+:focus-visible{outline:4px solid var(--amber);outline-offset:3px}
+.card{background:var(--panel);border:3px solid var(--line);border-radius:24px;padding:20px 24px;margin:16px 0}
+.mute{color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.tchip{font-size:20px;font-weight:700;padding:6px 18px;border-radius:999px;border:3px solid var(--line);background:var(--panel2);color:var(--mute);cursor:pointer}
+.tchip.on{background:var(--teal);color:#06231f;border-color:var(--teal)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.step{display:inline-block;background:var(--amber);color:#2a1d00;font-weight:700;border-radius:999px;padding:2px 14px;margin-right:8px;font-size:20px}
+.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.skillrow{border-top:2px solid var(--line);padding:12px 0}
+.skillrow:first-of-type{border-top:0}
+label.chk{display:flex;gap:12px;align-items:center;font-weight:700;font-size:24px;cursor:pointer}
+input[type=checkbox]{width:28px;height:28px;accent-color:#5eead4}
+input[type=text],input[type=number],input[type=datetime-local],select,textarea{background:var(--bg);border:3px solid var(--line);border-radius:14px;padding:8px 14px;width:100%}
+input[type=number]{width:110px}
+input[type=datetime-local]{width:auto}
+select{width:auto}
+textarea{min-height:140px;font-size:18px;font-family:Consolas,Menlo,monospace;line-height:1.35}
+.hint{color:var(--mute);font-size:19px;margin:4px 0 0}
+.sum{background:var(--panel2);border:3px solid var(--line);border-radius:18px;padding:12px 20px;margin-top:12px}
+.sum li{margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:19px}
+th,td{padding:8px 10px;border-bottom:2px solid var(--line);text-align:left;vertical-align:middle}
+th{color:var(--mute);font-weight:400}
+.ok{color:var(--good);font-weight:700}.bad{color:var(--soft);font-weight:700}
+.scroll{overflow-x:auto}
+.bar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 25%);padding:24px 0 12px;display:flex;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div><p class="eyebrow">SpitzVerse &middot; Teacher page</p><h1>Teacher controls</h1><p class="credit">Nothing here changes the student site until you upload the file it makes.</p></div>
+    <a class="pill" id="hubLink" href="index.html">&larr; Student menu</a></div>
+
+  <div class="card">
+    <p style="margin:0"><b>How this works:</b> change anything below, then press <b>Download settings.js</b> at the bottom and upload that file to GitHub. Students see the change within a minute or two. You can come back and change things any time. Whatever is already live loads here automatically.</p>
+  </div>
+
+  <h2><span class="step">1</span>Assign (lock students to a skill)</h2>
+  <div class="card"><p class="hint" style="margin-top:0">While anything is checked, students can only pick the checked skills. Old bookmarks follow the lock too. Leave all unchecked to unlock everything.</p><div id="assign"></div></div>
+
+  <h2><span class="step">2</span>Suggest a skill (bonus points)</h2>
+  <div class="card"><p class="hint" style="margin-top:0">Suggested skills get a star and move to the front. Students earn bonus points for playing them.</p><div id="suggest"></div>
+    <div class="row"><label for="note"><b>Short note for students (optional):</b></label></div>
+    <input type="text" id="note" maxlength="90" placeholder="Example: Practice subjects and verbs this week!">
+    <div class="row"><label for="bonus"><b>Bonus:</b></label><input type="number" id="bonus" min="0" max="100" step="5" value="25"> <span>% extra points</span></div></div>
+
+  <h2><span class="step">3</span>Hide a skill</h2>
+  <div class="card"><p class="hint" style="margin-top:0">Hidden skills disappear from the student menu. (If you assign skills in step 1, step 1 wins.)</p><div id="hide"></div>
+    <div class="row"><label for="fallback"><b>If everything is hidden, use:</b></label><select id="fallback"></select></div></div>
+
+  <h2><span class="step">4</span>Release schedule for games</h2>
+  <div class="card"><p class="hint" style="margin-top:0">Keep new games hidden and open one or two a week so students keep coming back. New games get a NEW badge for 7 days.</p><div id="sched"></div></div>
+
+  <h2><span class="step">5</span>Where students send their code</h2>
+  <div class="card"><p class="hint" style="margin-top:0">Paste the link to your Google Form (the one that asks for name and code). Students get a Send button that copies their code and opens it. Leave empty for now if you have not made it yet.</p>
+    <input type="text" id="formUrl" placeholder="https://forms.gle/..."></div>
+
+  <h2><span class="step">6</span>Your settings file</h2>
+  <div class="card"><div class="sum"><b>Students will see:</b><ul id="summary" style="margin:6px 0 0;padding-left:24px"></ul></div>
+    <p class="hint">This is the text of the file. You do not need to edit it by hand.</p>
+    <textarea id="out" readonly aria-label="settings.js text"></textarea>
+    <div class="bar"><button class="btn" id="dl">Download settings.js</button><button class="btn alt" id="cp">Copy text</button><button class="btn alt" id="reset">Clear everything</button></div></div>
+
+  <h2><span class="step">7</span>Leaderboard</h2>
+  <div class="card">
+    <p style="margin-top:0">1) In your Google Form's responses sheet, select all the rows and copy them. 2) Paste them here. 3) Check the names, tick <b>Count it</b> for the ones you want public, then download <b>leaderboard.json</b> and upload it to GitHub (inside the <b>data</b> folder).</p>
+    <textarea id="paste" placeholder="Paste the rows from your response sheet here (Timestamp, Name, Code)" aria-label="Pasted form responses"></textarea>
+    <div class="row"><button class="btn" id="check">Check codes</button><span class="hint" id="checkMsg"></span></div>
+    <div class="scroll" id="rows"></div>
+    <div id="lbOut" hidden>
+      <h3 style="margin:18px 0 6px">Leaderboard file (only names you ticked)</h3>
+      <textarea id="lbText" readonly aria-label="leaderboard.json text"></textarea>
+      <div class="bar"><button class="btn" id="lbDl">Download leaderboard.json</button><button class="btn alt" id="lbCp">Copy text</button></div>
+    </div>
+    <div id="stats"></div>
+  </div>
+</div>
+<script src="settings.js"></script>
+<script src="games/catalog.js"></script>
+<script src="games/questions.js"></script>
+<script src="games/scorecode.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var P = window.SV_PREVIEW || null, META = SpitzQ.meta();
+var CUR = (typeof SV_SETTINGS !== 'undefined' && SV_SETTINGS) ? SV_SETTINGS : {};
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+/* ---- skill pickers: {setId: {on:bool, t:{topicId:bool}}} ---- */
+function stateFrom(list) {
+  var st = {};
+  META.forEach(function (s) { st[s.id] = { on: false, t: {} }; s.topics.forEach(function (t) { st[s.id].t[t.id] = true; }); });
+  (list || []).forEach(function (e) {
+    if (!st[e.id]) return; st[e.id].on = true;
+    if (e.topics && e.topics.length) { Object.keys(st[e.id].t).forEach(function (k) { st[e.id].t[k] = e.topics.indexOf(k) >= 0; }); }
+  });
+  return st;
+}
+function listFrom(st) {
+  var out = [];
+  META.forEach(function (s) {
+    if (!st[s.id].on) return;
+    var on = s.topics.filter(function (t) { return st[s.id].t[t.id]; }).map(function (t) { return t.id; });
+    if (!on.length || on.length === s.topics.length) out.push({ id: s.id }); else out.push({ id: s.id, topics: on });
+  });
+  return out;
+}
+var S = { assign: stateFrom(CUR.assign), suggest: stateFrom(CUR.suggest), hide: {} };
+(CUR.hide || []).forEach(function (id) { S.hide[id] = true; });
+function drawPicker(boxId, st, withTopics) {
+  var box = $(boxId); box.innerHTML = '';
+  META.forEach(function (s) {
+    var row = el('div', 'skillrow'), lab = el('label', 'chk'), cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = withTopics ? st[s.id].on : !!S.hide[s.id];
+    cb.onchange = function () { if (withTopics) st[s.id].on = cb.checked; else S.hide[s.id] = cb.checked; update(); drawPicker(boxId, st, withTopics); };
+    lab.appendChild(cb); lab.appendChild(el('span', null, s.name)); row.appendChild(lab);
+    if (withTopics && st[s.id].on) {
+      var chips = el('div', 'chips'); chips.style.marginTop = '8px';
+      s.topics.forEach(function (t) {
+        var b = el('button', 'tchip' + (st[s.id].t[t.id] ? ' on' : ''), t.name);
+        b.onclick = function () { st[s.id].t[t.id] = !st[s.id].t[t.id]; update(); drawPicker(boxId, st, withTopics); };
+        chips.appendChild(b);
+      });
+      row.appendChild(chips);
+    }
+    box.appendChild(row);
+  });
+}
+
+/* ---- release schedule ---- */
+var SCHED = {};
+SV_GAMES.forEach(function (g) {
+  var u = (CUR.unlock && CUR.unlock[g.id] !== undefined) ? CUR.unlock[g.id] : SV_UNLOCK[g.id];
+  if (u === null || u === undefined || u === 'hidden') SCHED[g.id] = { mode: 'hidden', at: '' };
+  else if (u === 'now') SCHED[g.id] = { mode: 'now', at: '' };
+  else SCHED[g.id] = { mode: 'date', at: u };
+});
+function drawSched() {
+  var box = $('sched'); box.innerHTML = '';
+  SV_GAMES.forEach(function (g) {
+    var row = el('div', 'row'), sel = document.createElement('select'), s = SCHED[g.id];
+    row.appendChild(el('b', null, g.name));
+    [['now', 'Open now'], ['date', 'Release on a date'], ['hidden', 'Hidden for now']].forEach(function (o) {
+      var op = el('option', null, o[1]); op.value = o[0]; if (s.mode === o[0]) op.selected = true; sel.appendChild(op);
+    });
+    sel.onchange = function () { s.mode = sel.value; if (s.mode === 'date' && !s.at) s.at = new Date(Date.now() + 864e5).toISOString().slice(0, 11) + '08:00'; update(); drawSched(); };
+    row.appendChild(sel);
+    if (s.mode === 'date') {
+      var dt = document.createElement('input'); dt.type = 'datetime-local'; dt.value = s.at; dt.onchange = function () { s.at = dt.value; update(); };
+      row.appendChild(dt);
+    }
+    box.appendChild(row);
+  });
+}
+
+/* ---- build the settings object + file text ---- */
+function build() {
+  var o = { assign: listFrom(S.assign), suggest: listFrom(S.suggest), note: $('note').value.trim(),
+    bonus: Math.max(0, Math.min(100, parseInt($('bonus').value, 10) || 0)),
+    hide: Object.keys(S.hide).filter(function (k) { return S.hide[k]; }), fallback: $('fallback').value || META[0].id, unlock: {}, formUrl: $('formUrl').value.trim() };
+  SV_GAMES.forEach(function (g) { var s = SCHED[g.id]; o.unlock[g.id] = s.mode === 'now' ? 'now' : (s.mode === 'hidden' ? 'hidden' : (s.at || 'hidden')); });
+  return o;
+}
+function fileText(o) { return '/* SpitzVerse teacher settings. Made by teacher.html on ' + new Date().toLocaleString() + ' */\nvar SV_SETTINGS = ' + JSON.stringify(o, null, 2) + ';\n'; }
+function nm(id) { return META.filter(function (s) { return s.id === id; })[0].name; }
+function entryText(e) {
+  var s = META.filter(function (x) { return x.id === e.id; })[0];
+  return s.name + (e.topics ? ' (' + e.topics.map(function (id) { return s.topics.filter(function (t) { return t.id === id; })[0].name; }).join(', ') + ')' : '');
+}
+function update() {
+  var o = build(), ul = $('summary'); ul.innerHTML = '';
+  function li(t) { ul.appendChild(el('li', null, t)); }
+  if (o.assign.length) li('Locked to: ' + o.assign.map(entryText).join(' and ') + '. Students cannot pick anything else.');
+  else if (o.hide.length) li('Everything except: ' + o.hide.map(nm).join(', ') + ' (hidden).');
+  else li('All skills open.');
+  var sg = o.suggest; if (sg.length) li('\u2B50 Suggested: ' + sg.map(entryText).join(' and ') + ' \u2014 +' + o.bonus + '% bonus points' + (o.note ? '. Note: \u201C' + o.note + '\u201D' : '') + '.');
+  SV_GAMES.forEach(function (g) { var u = o.unlock[g.id]; li(g.name + ': ' + (u === 'now' ? 'open now' : u === 'hidden' ? 'hidden' : 'opens ' + new Date(u).toLocaleString())); });
+  li(o.formUrl ? 'Send button opens your Google Form.' : 'No Google Form link yet (students are told to ask you).');
+  $('out').value = fileText(o);
+}
+function download(name, text) {
+  var b = new Blob([text], { type: 'text/javascript' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function copyText(ta, btn) { ta.select(); try { navigator.clipboard.writeText(ta.value); } catch (e) { try { document.execCommand('copy'); } catch (e2) {} } btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy text'; }, 1500); }
+
+/* ---- init the form from the live settings ---- */
+var fb = $('fallback'); META.forEach(function (s) { var op = el('option', null, s.name); op.value = s.id; fb.appendChild(op); });
+fb.value = CUR.fallback || META[0].id; $('note').value = CUR.note || ''; $('bonus').value = CUR.bonus == null ? 25 : CUR.bonus; $('formUrl').value = CUR.formUrl || '';
+['note', 'bonus', 'formUrl'].forEach(function (id) { $(id).addEventListener('input', update); }); fb.onchange = update;
+drawPicker('assign', S.assign, true); drawPicker('suggest', S.suggest, true); drawPicker('hide', null, false); drawSched(); update();
+$('dl').onclick = function () { download('settings.js', $('out').value); };
+$('cp').onclick = function () { copyText($('out'), $('cp')); };
+$('reset').onclick = function () {
+  S.assign = stateFrom([]); S.suggest = stateFrom([]); S.hide = {}; $('note').value = ''; $('bonus').value = 25; $('formUrl').value = '';
+  SV_GAMES.forEach(function (g) { SCHED[g.id] = { mode: 'now', at: '' }; });
+  drawPicker('assign', S.assign, true); drawPicker('suggest', S.suggest, true); drawPicker('hide', null, false); drawSched(); update();
+};
+if (P && P.pages && P.pages.hub) $('hubLink').href = P.pages.hub;
+
+/* ---- leaderboard builder ---- */
+function csvSplit(line) {
+  var out = [], cur = '', q = false, i, c;
+  for (i = 0; i < line.length; i++) { c = line.charAt(i);
+    if (q) { if (c === '"') { if (line.charAt(i + 1) === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
+  out.push(cur); return out;
+}
+var CODE_RE = /^[A-Za-z2-9]{4}-?[A-Za-z2-9]{4}-?[A-Za-z2-9]{4}-?[A-Za-z2-9]{4}$/;
+function parseRows(text) {
+  var rows = [];
+  text.split(/\r?\n/).forEach(function (line) {
+    if (!line.trim()) return;
+    var cells = (line.indexOf('\t') >= 0 ? line.split('\t') : csvSplit(line)).map(function (c) { return c.trim().replace(/^"|"$/g, '').trim(); });
+    var code = null, name = null, ts = '';
+    cells.forEach(function (c) { if (!code && CODE_RE.test(c) && SpitzCode.decode(c)) code = c; });
+    if (!code) return;
+    cells.forEach(function (c) {
+      if (c === code || !c) return;
+      if (/^\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/.test(c)) { if (!ts) ts = c; return; }
+      if (!name && /[A-Za-z]/.test(c)) name = c;
+    });
+    rows.push({ ts: ts, name: name || '', code: code.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/(.{4})(?=.)/g, '$1-') });
+  });
+  return rows;
+}
+var ROWS = [], COUNT = {};
+try { COUNT = JSON.parse(lsGet('sv_counted') || '{}'); } catch (e) { COUNT = {}; }
+function norm(n) { return SpitzCode.norm(n); }
+function evaluate(rows) {
+  var seen = {};
+  return rows.map(function (r) {
+    var v = SpitzCode.verify(r.code, r.name), f = v.fields, e = { r: r, key: norm(r.name) + '|' + r.code, ok: false, why: '' };
+    if (!r.name) e.why = 'No name found';
+    else if (!f) e.why = 'Code unreadable';
+    else if (!v.ok) e.why = 'Name does not match this code';
+    else if (seen[r.code]) e.why = 'Duplicate code';
+    else {
+      var g = SV_GAMES.filter(function (x) { return x.no === f.game; })[0], set = SpitzQ.SETS[f.set];
+      if (!g || !set) e.why = 'Unknown game or skill';
+      else { e.ok = true; e.f = f; e.g = g; e.set = set; e.topicIds = f.topics.filter(function (k) { return set.topics[k]; }).map(function (k) { return set.topics[k].id; }); seen[r.code] = true; }
+    }
+    return e;
+  });
+}
+function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+function drawRows() {
+  var box = $('rows'); box.innerHTML = '';
+  if (!ROWS.length) return;
+  var t = document.createElement('table');
+  t.innerHTML = '<thead><tr><th>Count it</th><th>Name</th><th>Game</th><th>Skill</th><th>Score</th><th>Right</th><th>Check</th><th>Sent</th></tr></thead>';
+  var tb = document.createElement('tbody');
+  ROWS.forEach(function (e) {
+    var tr = document.createElement('tr'), c0 = document.createElement('td'), cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.disabled = !e.ok; cb.checked = e.ok && !!COUNT[e.key]; cb.setAttribute('aria-label', 'Count ' + e.r.name);
+    cb.onchange = function () { if (cb.checked) COUNT[e.key] = true; else delete COUNT[e.key]; lsSet('sv_counted', JSON.stringify(COUNT)); buildBoard(); };
+    c0.appendChild(cb); tr.appendChild(c0);
+    function td(txt, cls) { var c = el('td', cls, txt); tr.appendChild(c); }
+    td(e.r.name || '(none)');
+    if (e.ok) {
+      td(e.g.name);
+      var tn = e.topicIds.length < e.set.topics.length ? ' \u2014 ' + e.topicIds.join(', ') : '';
+      td(e.set.name + tn); td(String(e.f.score) + (e.f.bonus ? ' \u2B50' : '')); td(e.f.correct + '/' + e.f.answered + ' (' + pct(e.f.correct, e.f.answered) + '%)'); td('OK', 'ok');
+    } else { td(''); td(''); td(''); td(''); td(e.why, 'bad'); }
+    td(e.r.ts);
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); box.appendChild(t);
+}
+function buildBoard() {
+  var best = {}; // game -> student -> entry
+  ROWS.forEach(function (e) {
+    if (!e.ok || !COUNT[e.key]) return;
+    var g = e.g.id, who = norm(e.r.name); best[g] = best[g] || {};
+    if (!best[g][who] || best[g][who].score < e.f.score)
+      best[g][who] = { name: e.r.name, score: e.f.score, correct: e.f.correct, answered: e.f.answered, set: e.set.id, topics: e.topicIds, bonus: !!e.f.bonus };
+  });
+  var out = { updated: new Date().toISOString().slice(0, 10), games: {} };
+  Object.keys(best).forEach(function (g) {
+    out.games[g] = Object.keys(best[g]).map(function (k) { return best[g][k]; }).sort(function (a, b) { return b.score - a.score; }).slice(0, 10);
+  });
+  $('lbOut').hidden = false; $('lbText').value = JSON.stringify(out, null, 2) + '\n';
+}
+function drawStats() {
+  var g = {}, box = $('stats'); box.innerHTML = '';
+  ROWS.forEach(function (e) {
+    if (!e.ok) return;
+    var k = e.set.name + (e.topicIds.length < e.set.topics.length ? ' \u2014 ' + e.set.topics.filter(function (t) { return e.topicIds.indexOf(t.id) >= 0; }).map(function (t) { return t.name; }).join(', ') : '');
+    g[k] = g[k] || { runs: 0, c: 0, a: 0 }; g[k].runs++; g[k].c += e.f.correct; g[k].a += e.f.answered;
+  });
+  var keys = Object.keys(g); if (!keys.length) return;
+  box.appendChild(el('h3', null, 'Class accuracy by skill (all valid codes)'));
+  var t = document.createElement('table'); t.innerHTML = '<thead><tr><th>Skill</th><th>Runs</th><th>Right</th></tr></thead>';
+  var tb = document.createElement('tbody');
+  keys.forEach(function (k) { var tr = document.createElement('tr'); tr.appendChild(el('td', null, k)); tr.appendChild(el('td', null, String(g[k].runs))); tr.appendChild(el('td', null, pct(g[k].c, g[k].a) + '%  (' + g[k].c + ' of ' + g[k].a + ')')); tb.appendChild(tr); });
+  t.appendChild(tb); box.appendChild(t);
+}
+$('check').onclick = function () {
+  var rows = parseRows($('paste').value);
+  ROWS = evaluate(rows);
+  var okN = ROWS.filter(function (e) { return e.ok; }).length;
+  $('checkMsg').textContent = ROWS.length ? ROWS.length + ' rows read, ' + okN + ' valid.' : 'I could not find any codes. Make sure you copied the Name and Code columns.';
+  drawRows(); buildBoard(); drawStats(); if (!ROWS.length) $('lbOut').hidden = true;
+};
+$('lbDl').onclick = function () { download('leaderboard.json', $('lbText').value); };
+$('lbCp').onclick = function () { copyText($('lbText'), $('lbCp')); };
+})();
+</script>
+</body>
+</html>
